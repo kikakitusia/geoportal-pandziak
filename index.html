@@ -36,13 +36,15 @@ sateliteLayer.addTo(mymap)
 
 var baseLayers = {
 	"Mapa satelitarna": sateliteLayer,
-    "OpenStreetMap": osm};
+    	"OpenStreetMap": osm};
 L.control.layers(baseLayers).addTo(mymap);
 	
 // wtyczka -- sidebar 
 var sidebar = L.control.sidebar('sidebar', {
-    position: 'left',
-	closeButton: false
+   	position: 'left',
+	closeButton: false,
+	display: block,
+   	visibility: visible
 }).addTo(mymap);
 
 function PToL(feature,latlng) {
