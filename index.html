@@ -42,9 +42,7 @@ L.control.layers(baseLayers).addTo(mymap);
 // wtyczka -- sidebar 
 var sidebar = L.control.sidebar('sidebar', {
    	position: 'left',
-	closeButton: false,
-	display: block,
-   	visibility: visible
+	closeButton: false
 }).addTo(mymap);
 
 function PToL(feature,latlng) {
@@ -85,13 +83,13 @@ function oEF(feature, layer) {
 				Od 2008 roku pandka ruda jest uważana za gatunek zagrożony wyginięciem, a jej populację oszacowano na mniej niż 10 tyś. osobników.
 				</p>
         `);
-	e.originalEvent.stopPropagation();	
+	
     });
 	
     mymap.on('click', function () {
         if (sidebar.isVisible()) {
             sidebar.hide();
-		mymap.flyTo([52.02,20.19], 7);
+	mymap.flyTo([52.02,20.19], 7);
         }
     });
 }
