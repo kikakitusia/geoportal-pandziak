@@ -1,0 +1,2 @@
+# geoportal-pandziak
+projekt gis
