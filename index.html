@@ -64,7 +64,6 @@ function oEF(feature, layer) {
 		{direction:"top"}).openTooltip();
 		
 	layer.on('click', function (e) {
-		mymap.flyTo(layer.getLatLng(), 10);
 		console.log('marker:', feature.properties);
         	sidebar.show();
 		console.log('sidebar:', sidebar);
@@ -88,7 +87,6 @@ function oEF(feature, layer) {
     mymap.on('click', function () {
         if (sidebar.isVisible()) {
             sidebar.hide();
-	mymap.flyTo([52.02,20.19], 7);
         }
     });
 }
