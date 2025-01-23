@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+html,body,
+#map{width:100%;height:100%;position:relative;padding:0;margin:0;}
+#map-title {
+            position: absolute; left: 50%; transform: translateX(-50%); background-color: rgba(248, 85, 169, 0.6); padding: 10px 20px; 
+            border-radius: 5px;font-size: 16px;font-family: Georgia, serif;font-weight: bold; z-index: 1000; color:white
+			}
+
+</style>
+
+<title>Geoportal</title>
+<link rel="icon" type="image/ico" href="favicon.ico"/>
+<meta charset="UTF=8">
+</head>
+
+<body>
+<div id="map"> 
+<div id="map-title">❀Sprawdź, czy w wybranym ogrodzie zoologicznym znajduje się pandka ruda❀</div></div>
+<div id="sidebar"><h1>leaflet-sidebar</h1></div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+<link rel="stylesheet" href="leaflet-sidebar-master/src/L.Control.Sidebar.css" />
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+<script src="zoo.js"></script>
+<script src="leaflet-sidebar-master/src/L.Control.Sidebar.js"></script>
+
+<script>
+var mymap=L.map('map',{maxZoom:20}).setView([52.02,20.19],6)
+var osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', {foo: 'bar', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'})
+var sateliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles © Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'});
+sateliteLayer.addTo(mymap)
+
+var baseLayers = {
+	"Mapa satelitarna": sateliteLayer,
+    "OpenStreetMap": osm};
+L.control.layers(baseLayers).addTo(mymap);
+	
+// wtyczka -- sidebar 
+var sidebar = L.control.sidebar('sidebar', {
+    position: 'left',
+	closeButton: false
+}).addTo(mymap);
+
+function PToL(feature,latlng) {
+
+	var czyrudapanda = feature.properties.pandkamala === "TAK";
+	
+	style = {radius:8, opacity:1, 
+			color: czyrudapanda ? 'rgba(37, 181, 15, 1)' : 'rgba(170, 0, 0, 1)',
+			weight:1, fill:true, fillOpacity:0.4, 
+			fillColor: czyrudapanda ? 'rgba(37, 181, 15, 1)' : 'rgba(170, 0, 0, 1)'}
+	return L.circleMarker(latlng,style);
+}
+
+function oEF(feature, layer) {
+	var czyrudapanda = feature.properties.pandkamala === "TAK";
+	var props = feature.properties;
+	
+	layer.bindTooltip(czyrudapanda ? 'W tym ZOO znajdują się osobniki pandy małej!' : 'W tym ZOO nie ma osobników pandy małej',
+		{direction:"top"}).openTooltip();
+		
+	layer.on('click', function (event) {
+		mymap.flyTo(layer.getLatLng(), 10);
+        sidebar.show();
+		sidebar.setContent(`
+            <h1 style="text-align:center;font-family: Georgia, serif;font-weight: bold;color:white;margin-top:30px;">
+							${czyrudapanda ? 'W tym ZOO znajdują się osobniki pandy małej!' : 'W tym ZOO nie ma osobników pandy małej'}</h1>
+			
+			<p style="text-align:center;font-family: Georgia, serif;font-weight: bold;color:white;margin-bottom:3px;">${props.nazwa}</p>
+            <a href="${props.link}" style="display:block; text-align:center;color:white; text-decoration:underline">Zobacz stronę internetową</a>
+            <img src="pandka_foteczka.jpg" style="width:100%;height:33%; border-radius:4px;margin-top:30px;">
+			<p style="text-align:justify;font-family: Georgia, serif;color:white;margin-top:5px;">
+				Panda mała, nazywana również pandką rudą lub pandą czerwoną, to drapieżny ssak z rodziny pandkowatych. 
+				Jej naturalny zasięg występowania obejmuje tereny południowych Chin, północno-wschodnich Indii, Nepal oraz północną Mjanmę.
+				Pandka ruda jest zwierzęciem wszystkożernym, jednak podstawę jej diety stanowi bambus.
+				Oprócz białego pyszczka i puchatego, pokrytego pierścieniami ogona, wyróżnia ją rdzawy kolor futra, który w naturalnym środowisku służy jako doskonały kamuflaż.
+				Od 2008 roku pandka ruda jest uważana za gatunek zagrożony wyginięciem, a jej populację oszacowano na mniej niż 10 tyś. osobników.
+				</p>
+        `);
+		event.stopPropagation();
+
+    });
+	
+    mymap.on('click', function () {
+        if (sidebar.isVisible()) {
+            sidebar.hide();
+		mymap.flyTo([52.02,20.19], 7);
+        }
+    });
+}
+
+var sidebarContainer = sidebar.getContainer();
+sidebarContainer.style.backgroundColor = "rgba(248, 85, 169, 0.6)";
+
+var greenLayer = L.geoJSON(zooData, {
+    filter: function (feature) {
+        return feature.properties.pandkamala === "TAK";
+    },
+    onEachFeature: oEF,
+    pointToLayer: PToL});
+
+var redLayer = L.geoJSON(zooData, {
+    filter: function (feature) {
+        return feature.properties.pandkamala === "NIE";
+    },
+    onEachFeature: oEF,
+    pointToLayer: PToL});
+
+var overlayLayers = {
+    "TAK": greenLayer,
+    "NIE": redLayer};
+	
+L.control.layers(null, overlayLayers).addTo(mymap);
+greenLayer.addTo(mymap);
+redLayer.addTo(mymap);
+
+
+
+</script>
+
+</body>
+
+</html>
