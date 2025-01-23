@@ -65,7 +65,9 @@ function oEF(feature, layer) {
 		
 	layer.on('click', function (event) {
 		mymap.flyTo(layer.getLatLng(), 10);
-        sidebar.show();
+		console.log('marker:', feature.properties);
+        	sidebar.show();
+		console.log('sidebar:', sidebar);
 		sidebar.setContent(`
             <h1 style="text-align:center;font-family: Georgia, serif;font-weight: bold;color:white;margin-top:30px;">
 							${czyrudapanda ? 'W tym ZOO znajdują się osobniki pandy małej!' : 'W tym ZOO nie ma osobników pandy małej'}</h1>
@@ -81,7 +83,7 @@ function oEF(feature, layer) {
 				Od 2008 roku pandka ruda jest uważana za gatunek zagrożony wyginięciem, a jej populację oszacowano na mniej niż 10 tyś. osobników.
 				</p>
         `);
-		
+	event.originalEvent.stopPropagation();	
 
     });
 	
